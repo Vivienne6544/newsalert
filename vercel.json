@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/core.php",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
