@@ -61,20 +61,32 @@ const YOUTUBE_CHANNELS = [
     'YouTube: Rogers Kakasungura' => 'UCRvrvGIjbwXqxK4ssy36xlw',
     'YouTube: Citizen TV'         => 'UChBQgieUidXV1CmDxSdRm3g',
 ];
-
 /* ============================ 2. DATABASE ============================ */
 
 function db() {
     static $pdo = null;
-    if ($pdo === null) {
-        $pdo = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4', DB_USER, DB_PASS, [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    if ($pdo !== null) return $pdo;
+
+    // Vercel Neon (Postgres)
+    $dbUrl = getenv('DATABASE_URL') ?: getenv('POSTGRES_URL') ?: getenv('POSTGRES_PRISMA_URL');
+    
+    if ($dbUrl) {
+        $o = parse_url($dbUrl);
+        $dsn = "pgsql:host={$o['host']};port={$o['port']};dbname=".ltrim($o['path'],'/').";sslmode=require";
+        $pdo = new PDO($dsn, $o['user'], $o['pass'], [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
+        return $pdo;
     }
+
+    // Fallback old MySQL (local testing)
+    $pdo = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4', DB_USER, DB_PASS, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
     return $pdo;
 }
-
 /* ============================ 3. FETCH ============================ */
 
 // Returns a plain list of items: title, summary, link, source, published_at
@@ -176,14 +188,16 @@ function matchTopic($text, $source = '') {
 // Keeps only matching items and saves them. The unique link skips duplicates.
 // Returns how many were new.
 function saveNew($items) {
-    $stmt = db()->prepare(
-        'INSERT IGNORE INTO articles (title, summary, link, source, topic, published_at)
-         VALUES (?, ?, ?, ?, ?, ?)'
-    );
+    $isPg = getenv('DATABASE_URL') ? true : false;
+    $sql = $isPg 
+        ? 'INSERT INTO articles (title, summary, link, source, topic, published_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (link) DO NOTHING'
+        : 'INSERT IGNORE INTO articles (title, summary, link, source, topic, published_at) VALUES (?, ?, ?, ?, ?, ?)';
+    
+    $stmt = db()->prepare($sql);
     $new = 0;
     foreach ($items as $i) {
         if ($i['title'] === '' || $i['link'] === '') continue;
-                      $topic = matchTopic($i['title'] . ' ' . ($i['match_text'] ?? $i['summary']), $i['source']) ?? 'general';
+        $topic = matchTopic($i['title'] . ' ' . ($i['match_text'] ?? $i['summary']), $i['source']) ?? 'general';
         $stmt->execute([$i['title'], $i['summary'], $i['link'], $i['source'], $topic, $i['published_at']]);
         $new += $stmt->rowCount();
     }
