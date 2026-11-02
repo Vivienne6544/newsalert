@@ -4,6 +4,10 @@
       "runtime": "vercel-php@0.7.4"
     }
   },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
   "crons": [
     {
       "path": "/api/cron",
