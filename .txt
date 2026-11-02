@@ -4,3 +4,7 @@ const DB_HOST = 'localhost';
 const DB_NAME = 'newsalatdb';
 const DB_USER = 'root';
 const DB_PASS = '';
+
+
+https://newsalat.vercel.app/api/cron
+https://newsalat.vercel.app/api/api.php?action=articles

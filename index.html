@@ -86,8 +86,8 @@ header{background:var(--green);color:#fff;position:sticky;top:0;z-index:10}
 
 <script>
 /* ---------- settings: change things here ---------- */
-const API = 'api.php';
-const VAPID_PUBLIC_KEY = 'BMsbTYvOFBsPKK9k5xKz8dyJ2IDDUVFWI2z3S1BK1-fKsA_qZbLITw_CL2ON6AojvW5SV28WLcm7SbGYEaVU2lg';
+const API = '/api/api.php';
+const VAPID_PUBLIC_KEY = 'BEVEIsZ0QhmJtWTrjBbYJvFr4O8M9tytlKH7V3SjWbxkkygU8OLV7epeV-9Dh3ucWwzkE2aBmNo8_wX6GjXrQhc';
 const REFRESH_MS = 2 * 60 * 1000;
 const TOPICS = [                       // add a topic = add one line (also add it in core.php)
   {id: 'finance',     label: 'Finance Bill'},
@@ -234,7 +234,16 @@ $('topics').addEventListener('change', async () => {
 /* ---------- start ---------- */
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 drawChips(); drawTopics(); loadFeed();
-const refresh = () => fetch(`${API}?action=cron`).then(r => r.json()).then(d => { if (d.new > 0) loadFeed(); }).catch(() => {});
+const FETCH_URL    = '/api/fetch-news.php';
+const FETCH_GAP_MS = 5 * 60 * 1000;   // each device asks at most once per 5 minutes
+
+function refresh() {
+  const last = Number(localStorage.getItem('newsalat_last_fetch') || 0);
+  if (Date.now() - last < FETCH_GAP_MS) return;
+  localStorage.setItem('newsalat_last_fetch', Date.now());
+  fetch(FETCH_URL).then(r => r.json()).then(d => { if (d.new > 0) loadFeed(); }).catch(() => {});
+}
+
 refresh();
 setInterval(() => { refresh(); loadFeed(); }, REFRESH_MS);
 </script>

@@ -14,9 +14,9 @@ const ALERT_GAP_MINUTES = 5;
 const FRESH_HOURS       = 3;
 const MAX_ARTICLES      = 50;
 
-define('VAPID_PUBLIC',  getenv('VAPID_PUBLIC_KEY') ?: getenv('VAPID_PUBLIC') ?: 'BEVEIsZ0QhmJtWTrjBbYJvFr4O8M9tytlKH7V3SjWbxkkygU8OLV7epeV-9Dh3ucWwzkE2aBmNo8_wX6GjXrQhc');
-define('VAPID_PRIVATE', getenv('VAPID_PRIVATE_KEY') ?: getenv('VAPID_PRIVATE') ?: 'G37sCIUe06iVJkevmC0ZRfjQ2BYTjTOL_OU492xArio');
-define('VAPID_SUBJECT', getenv('VAPID_SUBJECT') ?: 'mailto:viviennembithi@gmail.com');
+define('VAPID_PUBLIC',  getenv('VAPID_PUBLIC_KEY'));
+define('VAPID_PRIVATE', getenv('VAPID_PRIVATE_KEY'));
+define('VAPID_SUBJECT', getenv('VAPID_SUBJECT'));
 
 const TOPICS = [
     'finance'     => ['finance bill', 'finance act', 'mswada wa fedha', 'VAT', 'excise duty', 'withholding tax', 'surcharge', 'fiscal deficit', 'repeal', 'amendment'],
