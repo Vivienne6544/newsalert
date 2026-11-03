@@ -14,7 +14,7 @@ const ALERT_GAP_MINUTES = 5;
 const FRESH_HOURS       = 3;
 const MAX_ARTICLES      = 50;
 
-define('VAPID_PUBLIC',  getenv('VAPID_PUBLIC_KEY'));
+define('VAPID_PUBLIC', getenv('VAPID_PUBLIC_KEY'));
 define('VAPID_PRIVATE', getenv('VAPID_PRIVATE_KEY'));
 define('VAPID_SUBJECT', getenv('VAPID_SUBJECT'));
 
