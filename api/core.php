@@ -54,7 +54,7 @@ function db() {
         $o = parse_url($url);
         $dbname = explode('?', ltrim($o['path'], '/'))[0];
 
-        $endpointId = 'ep-bitter-paper-b8i3hh8v.c-14.'; // <-- your real ID here
+        $endpointId = 'ep-bitter-paper-b8i3hh8v'; // <-- your real ID here
 
         // This is the correct way for PHP to send the endpoint to Neon
         putenv('PGOPTIONS=--endpoint=' . $endpointId);
