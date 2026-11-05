@@ -54,12 +54,12 @@ function db() {
         $o = parse_url($url);
         $dbname = explode('?', ltrim($o['path'], '/'))[0];
 
-        // <-- PUT YOUR ID HERE. It's the first part of POSTGRES_HOST
-        // Example: if host is ep-cool-123456-us-east-2.aws.neon.tech
-        // your ID is ep-cool-123456
-        $endpointId = 'ep-bitter-paper-b8i3hh8v.c-14.';
+        $endpointId = 'ep-bitter-paper-b8i3hh8v.c-14.'; // <-- your real ID here
 
-        $dsn = 'pgsql:host=' . $o['host'] . ';port=' . ($o['port'] ?? 5432) . ';dbname=' . $dbname . ';sslmode=require;options=--endpoint=' . $endpointId;
+        // This is the correct way for PHP to send the endpoint to Neon
+        putenv('PGOPTIONS=--endpoint=' . $endpointId);
+
+        $dsn = 'pgsql:host=' . $o['host'] . ';port=' . ($o['port'] ?? 5432) . ';dbname=' . $dbname . ';sslmode=require';
         $pdo = new PDO($dsn, urldecode($o['user']), urldecode($o['pass']), [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
