@@ -16,10 +16,9 @@ const ALERT_GAP_MINUTES = 5;
 const FRESH_HOURS       = 3;
 const MAX_ARTICLES      = 50;
 
-define('VAPID_PUBLIC', getenv('VAPID_PUBLIC_KEY'));
-define('VAPID_PRIVATE', getenv('VAPID_PRIVATE_KEY'));
-define('VAPID_SUBJECT', getenv('VAPID_SUBJECT'));
-
+define('VAPID_PUBLIC', $_SERVER['VAPID_PUBLIC'] ?? getenv('VAPID_PUBLIC') ?: '');
+define('VAPID_PRIVATE', $_SERVER['VAPID_PRIVATE'] ?? getenv('VAPID_PRIVATE') ?: '');
+define('VAPID_SUBJECT', $_SERVER['VAPID_SUBJECT'] ?? getenv('VAPID_SUBJECT') ?: 'mailto:you@example.com');
 const TOPICS = [
     'finance'     => ['finance bill', 'finance act', 'mswada wa fedha', 'VAT', 'excise duty', 'withholding tax', 'surcharge', 'fiscal deficit', 'repeal', 'amendment'],
     'protest'     => ['protest', 'maandamano', 'demonstration', 'demonstrators', 'riot', 'march', 'picket', 'clashes'],
