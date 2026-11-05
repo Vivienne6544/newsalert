@@ -54,12 +54,10 @@ function db() {
         $o = parse_url($url);
         $dbname = explode('?', ltrim($o['path'], '/'))[0];
 
-        $endpointId = 'ep-bitter-paper-b8i3hh8v'; // <-- your real ID here
+        // auto-get ID from host: ep-bitter-paper-b8i3hh8v
+        $endpointId = explode('.', $o['host'])[0];
 
-        // This is the correct way for PHP to send the endpoint to Neon
-        putenv('PGOPTIONS=--endpoint=' . $endpointId);
-
-        $dsn = 'pgsql:host=' . $o['host'] . ';port=' . ($o['port'] ?? 5432) . ';dbname=' . $dbname . ';sslmode=require';
+        $dsn = 'pgsql:host=' . $o['host'] . ';port=' . ($o['port'] ?? 5432) . ';dbname=' . $dbname . ';sslmode=require;options=\'--endpoint=' . $endpointId . '\'';
         $pdo = new PDO($dsn, urldecode($o['user']), urldecode($o['pass']), [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
