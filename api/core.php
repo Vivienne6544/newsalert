@@ -53,7 +53,13 @@ function db() {
         if (!$url) throw new RuntimeException('DATABASE_URL is not set');
         $o = parse_url($url);
         $dbname = explode('?', ltrim($o['path'], '/'))[0];
-        $dsn = 'pgsql:host=' . $o['host'] . ';port=' . ($o['port'] ?? 5432) . ';dbname=' . $dbname . ';sslmode=require';
+
+        // <-- PUT YOUR ID HERE. It's the first part of POSTGRES_HOST
+        // Example: if host is ep-cool-123456-us-east-2.aws.neon.tech
+        // your ID is ep-cool-123456
+        $endpointId = 'ep-bitter-paper-b8i3hh8v.c-14.';
+
+        $dsn = 'pgsql:host=' . $o['host'] . ';port=' . ($o['port'] ?? 5432) . ';dbname=' . $dbname . ';sslmode=require;options=--endpoint=' . $endpointId;
         $pdo = new PDO($dsn, urldecode($o['user']), urldecode($o['pass']), [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
