@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/*.php": { "runtime": "vercel-php@0.6.0" },
+    "*.php": { "runtime": "vercel-php@0.6.0" }
+  },
+  "crons": [
+    { "path": "/api/cron", "schedule": "0 * * * *" }
+  ],
+  "cleanUrls": true
+}
