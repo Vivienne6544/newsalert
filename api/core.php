@@ -80,7 +80,7 @@ function fetchUrl($url) {
         CURLOPT_SSL_VERIFYPEER => true,
     ]);
     $d = curl_exec($ch);
-    curl_close($ch);
+
     return $d ?: '';
 }
 
