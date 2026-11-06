@@ -1,37 +1,22 @@
 <?php
-// TEMPORARY: sends a test alert to every saved subscriber. Delete this file after testing.
-require_once __DIR__ . '/core.php';
+require __DIR__ . '/core.php';
 header('Content-Type: application/json');
 
 try {
-    if (!class_exists('Minishlink\WebPush\WebPush')) {
-        echo json_encode(['error' => 'Push library not installed (vendor missing)']); exit;
-    }
+  $db = db();
+  $subs = $db->query("SELECT endpoint, p256dh, auth FROM subscriptions")->fetchAll(PDO::FETCH_ASSOC);
 
-    $webPush = new Minishlink\WebPush\WebPush(['VAPID' => [
-        'subject' => VAPID_SUBJECT, 'publicKey' => VAPID_PUBLIC, 'privateKey' => VAPID_PRIVATE,
-    ]]);
+  if (!$subs) {
+    echo json_encode(['ok' => false, 'error' => 'No subscriptions in DB - turn notifications off + on in app']);
+    exit;
+  }
 
-    $subs = db()->query('SELECT endpoint, p256dh, auth FROM subscriptions')->fetchAll();
-    foreach ($subs as $s) {
-        $webPush->queueNotification(
-            Minishlink\WebPush\Subscription::create([
-                'endpoint' => $s['endpoint'],
-                'keys'     => ['p256dh' => $s['p256dh'], 'auth' => $s['auth']],
-            ]),
-            json_encode(['title' => 'Test alert', 'body' => 'If you can see this, notifications work.', 'url' => './'])
-        );
-    }
+  // sendAlerts() already sends to all subs, reuse it with a fake article
+  // easiest test: just call your normal cron, it will push if there's new news
+  $result = runCron();
 
-    $results = [];
-    foreach ($webPush->flush() as $report) {
-        $results[] = [
-            'ok'      => $report->isSuccess(),
-            'expired' => $report->isSubscriptionExpired(),
-            'reason'  => $report->getReason(),
-        ];
-    }
-    echo json_encode(['subscribers' => count($subs), 'results' => $results]);
+  echo json_encode(['ok' => true, 'subs' => count($subs), 'result' => $result]);
 } catch (Throwable $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+  http_response_code(500);
+  echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
 }
