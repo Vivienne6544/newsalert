@@ -2,17 +2,102 @@
   "name": "newsalat",
   "short_name": "newsalat",
   "description": "Finance Bill, protest and agriculture news alerts",
-  "start_url": "./",
-  "scope": "./",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "tabbed"],
+  "orientation": "portrait",
   "background_color": "#eef2ef",
   "theme_color": "#0f5c3a",
+  "lang": "en",
+  "categories": ["news"],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+newsalat",
+      "url": "/?article=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "note_taking": {
+    "new_note_url": "/new-note"
+  },
+  "widgets": [
+    {
+      "name": "Latest News",
+      "short_name": "News",
+      "description": "Latest headlines from Newsalat",
+      "tag": "latest-news",
+      "template": "latest-news",
+      "ms_ac_template": "widgets/latest-news.json",
+      "data": "widgets/latest-news-data.json",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/icons/widget-screenshot.png",
+          "sizes": "540x240",
+          "label": "Latest News Widget"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ],
+      "auth": false,
+      "update": 86400
+    }
+  ],
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20512%20512'%3E%3Crect%20width='512'%20height='512'%20fill='%230f5c3a'/%3E%3Cg%20fill='none'%20stroke='white'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%20transform='translate(106%20106)%20scale(12.5)'%3E%3Cpath%20d='M6%208a6%206%200%200%201%2012%200c0%207%203%209%203%209H3s3-2%203-9'/%3E%3Cpath%20d='M10.3%2021a1.94%201.94%200%200%200%203.4%200'/%3E%3C/g%3E%3C/svg%3E",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Newsalat on Desktop"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Newsalat on Mobile"
     }
   ]
 }

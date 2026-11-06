@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>newsalat</title>
 <meta name="theme-color" content="#0f5c3a">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
@@ -232,7 +232,7 @@ $('topics').addEventListener('change', async () => {
 });
 
 /* ---------- start ---------- */
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+
 drawChips(); drawTopics(); loadFeed();
 const FETCH_URL    = '/api/fetch-news.php';
 const FETCH_GAP_MS = 5 * 60 * 1000;   // each device asks at most once per 5 minutes
@@ -246,6 +246,18 @@ function refresh() {
 
 refresh();
 setInterval(() => { refresh(); loadFeed(); }, REFRESH_MS);
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(async (reg) => {
+    if ('periodicSync' in reg) {
+      try { await reg.periodicSync.register('update-news', { minInterval: 24 * 60 * 60 * 1000 }); } catch(e) {}
+    }
+    if ('sync' in reg) {
+      try { await reg.sync.register('sync-newsalat'); } catch(e) {}
+    }
+  });
+}
 </script>
 </body>
 </html>

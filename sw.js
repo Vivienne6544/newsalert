@@ -1,12 +1,12 @@
 /*
- * newsalat sw.js: service worker.
- *  - push:  shows the alert sent by core.php
- *  - click: opens the app or the story
- *  - offline: keeps the page and the last news list
+ * newsalat sw.js
+ * - push, click, offline
+ * - + Background Sync (sync)
+ * - + Periodic Background Sync (periodicsync)
  */
 
-const CACHE = 'newsalat-v1';
-const PAGES = ['./', 'index.html', 'manifest.json'];
+const CACHE = 'newsalat-v3';
+const PAGES = ['/', '/index.html', '/manifest.json', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 /* ---------- install / update ---------- */
 self.addEventListener('install', e => {
@@ -22,7 +22,7 @@ self.addEventListener('activate', e => {
   );
 });
 
-/* ---------- offline: network first, saved copy as backup ---------- */
+/* ---------- offline ---------- */
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
@@ -30,7 +30,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
   const isPage = url.origin === location.origin && !url.pathname.endsWith('api.php');
   const isFeed = url.pathname.endsWith('api.php') && url.searchParams.get('action') === 'articles';
-  if (!isPage && !isFeed) return;   // cron, subscribe etc. always go straight to the network
+  if (!isPage && !isFeed) return;
 
   e.respondWith(
     fetch(req)
@@ -43,33 +43,60 @@ self.addEventListener('fetch', e => {
   );
 });
 
-/* ---------- push alert ---------- */
+/* ---------- push ---------- */
 self.addEventListener('push', e => {
-  let data = {title: 'newsalat', body: 'New story', url: './'};
+  let data = {title: 'newsalat', body: 'New story', url: '/'};
   try { data = Object.assign(data, e.data.json()); } catch (err) {}
 
   e.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      tag: 'newsalat',          // a new alert replaces the old one instead of stacking
+      tag: 'newsalat',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
       data: {url: data.url}
     })
   );
 });
 
-/* ---------- tap on the alert ---------- */
+/* ---------- tap ---------- */
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  const target = new URL(e.notification.data.url || './', self.registration.scope).href;
-
+  const target = new URL(e.notification.data.url || '/', self.registration.scope).href;
   e.waitUntil(
     clients.matchAll({type: 'window', includeUncontrolled: true}).then(list => {
       for (const c of list) {
-        if (c.url.startsWith(self.registration.scope) && 'focus' in c && target.startsWith(self.registration.scope)) {
-          return c.focus();   // app already open: just bring it forward
+        if (c.url.startsWith(self.registration.scope) && 'focus' in c) {
+          return c.focus();
         }
       }
       return clients.openWindow(target);
     })
   );
+});
+
+/* ---------- NEW: Background Sync - retries when back online ---------- */
+self.addEventListener('sync', e => {
+  if (e.tag === 'sync-newsalat') {
+    e.waitUntil(
+     fetch('/api/api.php?action=articles')
+        .then(res => res.json())
+        .then(data => caches.open(CACHE).then(c => c.put('/api/api.php?action=articles', new Response(JSON.stringify(data)))))
+        .catch(() => {})
+    );
+  }
+});
+
+/* ---------- NEW: Periodic Background Sync - fresh news in background ---------- */
+self.addEventListener('periodicsync', e => {
+  if (e.tag === 'update-news') {
+    e.waitUntil(
+    fetch('/api/api.php?action=articles')
+        .then(res => res.json())
+        .then(data => {
+          return caches.open(CACHE).then(c => c.put('/api/api.php?action=articles', new Response(JSON.stringify(data))));
+        })
+        .catch(() => {})
+    );
+  }
 });
