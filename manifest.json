@@ -6,6 +6,7 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "prefer_related_applications": false,
   "display_override": ["window-controls-overlay", "tabbed"],
   "orientation": "portrait",
   "background_color": "#eef2ef",
@@ -47,13 +48,7 @@
       "ms_ac_template": "widgets/latest-news.json",
       "data": "widgets/latest-news-data.json",
       "type": "application/json",
-      "screenshots": [
-        {
-          "src": "/widget-screenshot.png",
-          "sizes": "540x240",
-          "label": "Latest News Widget"
-        }
-      ],
+     
       "icons": [
         {
           "src": "/icon-192.png",
@@ -83,21 +78,7 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Newsalat on Desktop"
-    },
-    {
-      "src": "/screenshots/mobile.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Newsalat on Mobile"
-    }
   ]
+
+    
 }
