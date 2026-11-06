@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SW Check</title></head>
+<body style="font-family:sans-serif;padding:20px">
+<h2>SW Check</h2><pre id="out">loading...</pre>
+<button onclick="location.reload()" style="padding:12px 20px;font-size:16px">Reload</button>
+<script>
+(async()=>{
+  const o=document.getElementById('out');
+  const log=(s)=>{o.textContent+=s+"\n";};
+  o.textContent='';
+  log('permission: '+Notification.permission);
+  log('SW in navigator: '+('serviceWorker' in navigator));
+  if(!('serviceWorker' in navigator)) return;
+  try{
+    const reg=await navigator.serviceWorker.getRegistration();
+    log('registration: '+(reg?'YES':'NO - NOT REGISTERED'));
+    if(reg){
+      log('scope: '+reg.scope);
+      log('active: '+(reg.active?'YES':'NO'));
+      log('waiting: '+(reg.waiting?'YES':'NO'));
+      log('installing: '+(reg.installing?'YES':'NO'));
+      log('controller: '+(navigator.serviceWorker.controller?'YES':'NO - PAGE NOT CONTROLLED'));
+      const sub=await reg.pushManager.getSubscription();
+      log('push subscription: '+(sub?'YES':'NO - NOT SUBSCRIBED'));
+      if(sub) log('endpoint start: '+sub.endpoint.slice(0,60));
+    }
+  }catch(e){ log('ERROR: '+e.message); }
+})();
+</script>
+</body></html>
